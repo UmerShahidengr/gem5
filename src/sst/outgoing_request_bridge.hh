@@ -88,7 +88,7 @@ class OutgoingRequestBridge: public SimObject
 
     // Returns the range of addresses that the ports will handle.
     // Currently, it will return the range of [0x80000000, inf), which is
-    // specific to RISCV (SiFive's HiFive boards).
+    // specific to RISCV (SiFive's cva6 boards).
     AddrRangeList getAddrRanges() const;
 
     // Required to return a port during gem5 instantiate phase.

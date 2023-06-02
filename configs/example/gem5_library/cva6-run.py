@@ -27,7 +27,7 @@
 import argparse
 from gem5.resources.resource import Resource, CustomResource
 from gem5.simulate.simulator import Simulator
-from python.gem5.prebuilt.hifiveunmatched.hifive_board import HiFiveBoard
+from python.gem5.prebuilt.cva6.cva6_board import cva6Board
 
 # collect optional CLI arg for RISCV binary to run
 parser = argparse.ArgumentParser(description="Binary to run on system")
@@ -44,7 +44,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-board = HiFiveBoard(clk_freq="1.2GHz", l2_size="2MB", is_fs=args.fullsystem)
+board = cva6Board(clk_freq="1.2GHz", l2_size="2MB", is_fs=args.fullsystem)
 
 # Set FS or SE mode workload depending on user input
 if args.fullsystem:

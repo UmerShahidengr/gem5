@@ -38,10 +38,10 @@ from gem5.resources.resource import AbstractResource
 from gem5.components.memory import SingleChannelDDR4_2400
 from gem5.utils.requires import requires
 from gem5.isas import ISA
-from python.gem5.prebuilt.hifiveunmatched.hifive_cache import (
-    HiFiveCacheHierarchy,
+from python.gem5.prebuilt.cva6.cva6_cache import (
+    cva6CacheHierarchy,
 )
-from python.gem5.prebuilt.hifiveunmatched.hifive_proc import U74Processor
+from python.gem5.prebuilt.cva6.cva6_proc import U74Processor
 
 from gem5.isas import ISA
 
@@ -55,7 +55,7 @@ from m5.objects import (
     AddrRange,
     IOXBar,
     RiscvRTC,
-    HiFive,
+    cva6,
     IGbE_e1000,
     CowDiskImage,
     RawDiskImage,
@@ -81,7 +81,7 @@ def U74Memory():
     DDR4 Subsystem with 16GB of memory.
     Starts at 0x80000000.
     Details at: Section 23, page 195 of the datasheet.
-    
+
     return: ChanneledMemory
     """
     memory = SingleChannelDDR4_2400("16GB")
@@ -90,15 +90,15 @@ def U74Memory():
         )
     return memory
 
-class HiFiveBoard(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
+class cva6Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
     """
     A board capable of full system simulation for RISC-V
 
-    At a high-level, this is based on the HiFive Unmatched board from SiFive.
+    At a high-level, this is based on the cva6 Unmatched board from SiFive.
 
     This board assumes that you will be booting Linux for fullsystem emulation.
 
-    The frequency of the RTC for the system is set to 1MHz. 
+    The frequency of the RTC for the system is set to 1MHz.
     Details can be found on page 77, section 7.1 of the datasheet.
 
     Datasheet for inbuilt params can be found here: https://sifive.cdn.prismic.io/sifive/1a82e600-1f93-4f41-b2d8-86ed8b16acba_fu740-c000-manual-v1p6.pdf
@@ -120,7 +120,7 @@ class HiFiveBoard(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
         requires(isa_required=ISA.RISCV)
         self._fs = is_fs
 
-        cache_hierarchy = HiFiveCacheHierarchy(
+        cache_hierarchy = cva6CacheHierarchy(
             l2_size=l2_size
         )
 
@@ -140,7 +140,7 @@ class HiFiveBoard(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
             self.workload = RiscvLinux()
 
             # Contains a CLINT, PLIC, UART, and some functions for the dtb, etc.
-            self.platform = HiFive()
+            self.platform = cva6()
             # Note: This only works with single threaded cores.
             self.platform.plic.n_contexts = self.processor.get_num_cores() * 2
             self.platform.attachPlic()
@@ -251,31 +251,31 @@ class HiFiveBoard(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
     @overrides(AbstractSystemBoard)
     def has_io_bus(self) -> bool:
         return self._fs
-    
+
     @overrides(AbstractSystemBoard)
     def get_io_bus(self) -> IOXBar:
         if self._fs:
             return self.iobus
         else:
             raise NotImplementedError(
-                "HiFiveBoard does not have an IO bus. "
+                "cva6Board does not have an IO bus. "
                 "Use `has_io_bus()` to check this."
             )
-    
+
     @overrides(AbstractSystemBoard)
     def has_coherent_io(self) -> bool:
         return self._fs
-    
+
     @overrides(AbstractSystemBoard)
     def get_mem_side_coherent_io_port(self) -> Port:
         if self._fs:
             return self.iobus.mem_side_ports
         else:
             raise NotImplementedError(
-            "HiFiveBoard does not have any I/O ports. Use has_coherent_io to "
+            "cva6Board does not have any I/O ports. Use has_coherent_io to "
             "check this."
         )
-    
+
     @overrides(AbstractSystemBoard)
     def _setup_memory_ranges(self):
         """
@@ -551,7 +551,7 @@ class HiFiveBoard(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
     @overrides(KernelDiskWorkload)
     def get_default_kernel_args(self) -> List[str]:
         return ["console=ttyS0", "root={root_value}", "ro"]
-    
+
     @overrides(KernelDiskWorkload)
     def set_kernel_disk_workload(
         self,
@@ -574,4 +574,4 @@ class HiFiveBoard(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
             kernel_args=kernel_args,
             exit_on_work_items=exit_on_work_items,
         )
-        
+

@@ -35,43 +35,57 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __DEV_RISCV_HIFIVE_HH__
-#define __DEV_RISCV_HIFIVE_HH__
+#include "dev/riscv/cva6.hh"
 
-#include "dev/platform.hh"
 #include "dev/riscv/clint.hh"
 #include "dev/riscv/plic.hh"
-#include "params/HiFive.hh"
+#include "params/cva6.hh"
+#include "sim/system.hh"
 
 namespace gem5
 {
 
 using namespace RiscvISA;
 
-class HiFive : public Platform
+cva6::cva6(const Params &params) :
+    Platform(params),
+    clint(params.clint), plic(params.plic),
+    uartIntID(params.uart_int_id)
 {
-  public:
-    Clint *clint;
-    Plic *plic;
-    int uartIntID;
+}
 
-  public:
-    typedef HiFiveParams Params;
-    HiFive(const Params &params);
+void
+cva6::postConsoleInt()
+{
+    plic->post(uartIntID);
+}
 
-    void postConsoleInt() override;
+void
+cva6::clearConsoleInt()
+{
+    plic->clear(uartIntID);
+}
 
-    void clearConsoleInt() override;
+void
+cva6::postPciInt(int line)
+{
+    plic->post(line);
+}
 
-    void postPciInt(int line) override;
+void
+cva6::clearPciInt(int line)
+{
+    plic->clear(line);
+}
 
-    void clearPciInt(int line) override;
+void
+cva6::serialize(CheckpointOut &cp) const
+{
+}
 
-    void serialize(CheckpointOut &cp) const override;
-
-    void unserialize(CheckpointIn &cp) override;
-};
+void
+cva6::unserialize(CheckpointIn &cp)
+{
+}
 
 } // namespace gem5
-
-#endif  // __DEV_RISCV_HIFIVE_HH__

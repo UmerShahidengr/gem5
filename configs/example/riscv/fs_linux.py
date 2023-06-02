@@ -162,8 +162,8 @@ system.membus = MemBus()
 
 system.system_port = system.membus.cpu_side_ports
 
-# HiFive Platform
-system.platform = HiFive()
+# cva6 Platform
+system.platform = cva6()
 
 # RTCCLK (Set to 100MHz for faster simulation)
 system.platform.rtc = RiscvRTC(frequency=Frequency("100MHz"))

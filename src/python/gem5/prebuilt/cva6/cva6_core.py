@@ -141,7 +141,7 @@ class U74CPU(RiscvMinorCPU):
 
 class U74Core(AbstractCore):
     """
-        U74Core models the core of the HiFive Unmatched board.
+        U74Core models the core of the cva6 Unmatched board.
         The core has a single thread.
         The latencies of the functional units are set to values found in Table 8 on page 40.
           - IntFU: 1 cycle
@@ -152,8 +152,8 @@ class U74Core(AbstractCore):
           - BTBEntries: 16 entries
           - RASSize: 6 entries
           - IndirectSets: 8 sets
-          - localHistoryTableSize: 4096 B 
-        NOTE: The BHT of the HiFive Board is 3.6KiB but gem5 requires a power of 2, so the BHT is 4096B.
+          - localHistoryTableSize: 4096 B
+        NOTE: The BHT of the cva6 Board is 3.6KiB but gem5 requires a power of 2, so the BHT is 4096B.
     """
     def __init__(
         self,
@@ -203,4 +203,4 @@ class U74Core(AbstractCore):
     @overrides(AbstractCore)
     def get_mmu(self) -> BaseMMU:
         return self.core.mmu
-    
+

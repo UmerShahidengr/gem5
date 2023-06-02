@@ -39,7 +39,7 @@
 #ifndef __DEV_ARM_VIO_MMIO_HH__
 #define __DEV_ARM_VIO_MMIO_HH__
 
-#include "dev/riscv/hifive.hh"
+#include "dev/riscv/cva6.hh"
 #include "dev/riscv/plic_device.hh"
 #include "dev/virtio/base.hh"
 

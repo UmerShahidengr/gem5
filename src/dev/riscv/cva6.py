@@ -59,11 +59,11 @@ class GenericRiscvPciHost(GenericPciHost):
     # on/off the fdt dma-coherent flag when doing dtb autogeneration
     _dma_coherent = True
 
-class HiFive(Platform):
-    """HiFive Platform
+class cva6(Platform):
+    """cva6 Platform
 
     Implementation:
-        This is the base class for SiFive's HiFive
+        This is the base class for SiFive's cva6
         board series. It contains the CLINT and PLIC
         interrupt controllers, Uart and Disk.
 
@@ -74,7 +74,7 @@ class HiFive(Platform):
 
     Setup:
         The following sections outline the required
-        setup for a RISC-V HiFive platform. See
+        setup for a RISC-V cva6 platform. See
         configs/example/riscv/fs_linux.py for example.
 
     Driving CLINT:
@@ -96,7 +96,7 @@ class HiFive(Platform):
         up the PLIC interrupt source count.
 
     Uart:
-        The HiFive platform also has an uart_int_id.
+        The cva6 platform also has an uart_int_id.
         This is because Uart8250 uses postConsoleInt
         instead of postPciInt. In the future if a Uart
         that inherits PlicIntDevice is implemented,
@@ -110,9 +110,9 @@ class HiFive(Platform):
         each CPU (which allows them to differ). See
         fs_linux.py for setup example.
     """
-    type = 'HiFive'
-    cxx_header = "dev/riscv/hifive.hh"
-    cxx_class = 'gem5::HiFive'
+    type = 'cva6'
+    cxx_header = "dev/riscv/cva6.hh"
+    cxx_class = 'gem5::cva6'
 
     # CLINT
     clint = Param.Clint(Clint(pio_addr=0x2000000), "CLINT")
