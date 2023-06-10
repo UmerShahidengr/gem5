@@ -35,15 +35,13 @@ from gem5.components.boards.abstract_system_board import AbstractSystemBoard
 from gem5.components.boards.kernel_disk_workload import KernelDiskWorkload
 from gem5.components.boards.se_binary_workload import SEBinaryWorkload
 from gem5.resources.resource import AbstractResource
-from gem5.components.memory import SingleChannelDDR4_2400
+from gem5.components.memory import SingleChannelDDR3_1600
 from gem5.utils.requires import requires
 from gem5.isas import ISA
 from python.gem5.prebuilt.cva6.cva6_cache import (
     cva6CacheHierarchy,
 )
 from python.gem5.prebuilt.cva6.cva6_proc import U74Processor
-
-from gem5.isas import ISA
 
 import m5
 
@@ -56,7 +54,6 @@ from m5.objects import (
     IOXBar,
     RiscvRTC,
     cva6,
-    IGbE_e1000,
     CowDiskImage,
     RawDiskImage,
     RiscvMmioVirtIO,
@@ -84,7 +81,7 @@ def U74Memory():
 
     return: ChanneledMemory
     """
-    memory = SingleChannelDDR4_2400("16GB")
+    memory = SingleChannelDDR3_1600("1GB")
     memory.set_memory_range(
             [AddrRange(start=0x80000000, size=memory.get_size())]
         )
@@ -107,22 +104,18 @@ class cva6Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
     def __init__(
         self,
         clk_freq: str,
-        l2_size: str,
         is_fs: bool,
     ) -> None:
         """
 
         :param clk_freq: The clock frequency of the system
-        :param l2_size: The size of the L2 cache
         :param is_fs: Whether the system is a full system or not
 
         """
         requires(isa_required=ISA.RISCV)
         self._fs = is_fs
 
-        cache_hierarchy = cva6CacheHierarchy(
-            l2_size=l2_size
-        )
+        cache_hierarchy = cva6CacheHierarchy()
 
         memory = U74Memory()
 
@@ -184,14 +177,6 @@ class cva6Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
         if self._fs:
             #Add PCI
             self.platform.pci_host.pio = self.iobus.mem_side_ports
-
-            #Add Ethernet card
-            self.ethernet = IGbE_e1000(pci_bus=0, pci_dev=0, pci_func=0,
-                                    InterruptLine=1, InterruptPin=1)
-
-            self.ethernet.host = self.platform.pci_host
-            self.ethernet.pio  = self.iobus.mem_side_ports
-            self.ethernet.dma  = self.iobus.cpu_side_ports
 
             if self.get_cache_hierarchy().is_ruby():
                 for device in self._off_chip_devices + self._on_chip_devices:

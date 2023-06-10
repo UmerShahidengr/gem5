@@ -44,7 +44,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-board = cva6Board(clk_freq="1.2GHz", l2_size="2MB", is_fs=args.fullsystem)
+board = cva6Board(clk_freq="1.2GHz", is_fs=args.fullsystem)
 
 # Set FS or SE mode workload depending on user input
 if args.fullsystem:
