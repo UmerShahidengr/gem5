@@ -3,18 +3,15 @@
 ## Specs for the cva6 Unmatched
 
 ### Cache Hierarchy
-- L1D Size : 32kB
-- L1D Associativity : 8
-- L1I Size : 32kB
+- L1D Size : 16kB
+- L1D Associativity : 4
+- L1I Size : 16kB
 - L1I Associativity : 4
-- L2 Size : 2MB
-- L2 Associativity : 16
-- MMU Size : 4kiB
 - Branch Predictor:
     16 entry BTB, 3.6 kiB branch history table, 8 entry indirect jump target predictor, 6 entry RAS
 
 ### Memory
-- 16GB DDR4 channeled subsystem
+- 1GB DDR3 channeled subsystem
 - Starting address : 0x80000000
 
 ### CPU
