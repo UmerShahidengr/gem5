@@ -59,11 +59,11 @@ class GenericRiscvPciHost(GenericPciHost):
     # on/off the fdt dma-coherent flag when doing dtb autogeneration
     _dma_coherent = True
 
-class cva6(Platform):
-    """cva6 Platform
+class picorv32(Platform):
+    """picorv32 Platform
 
     Implementation:
-        This is the base class for SiFive's cva6
+        This is the base class for SiFive's picorv32
         board series. It contains the CLINT and PLIC
         interrupt controllers, Uart and Disk.
 
@@ -74,7 +74,7 @@ class cva6(Platform):
 
     Setup:
         The following sections outline the required
-        setup for a RISC-V cva6 platform. See
+        setup for a RISC-V picorv32 platform. See
         configs/example/riscv/fs_linux.py for example.
 
     Driving CLINT:
@@ -96,7 +96,7 @@ class cva6(Platform):
         up the PLIC interrupt source count.
 
     Uart:
-        The cva6 platform also has an uart_int_id.
+        The picorv32 platform also has an uart_int_id.
         This is because Uart8250 uses postConsoleInt
         instead of postPciInt. In the future if a Uart
         that inherits PlicIntDevice is implemented,
@@ -110,9 +110,9 @@ class cva6(Platform):
         each CPU (which allows them to differ). See
         fs_linux.py for setup example.
     """
-    type = 'cva6'
-    cxx_header = "dev/riscv/cva6.hh"
-    cxx_class = 'gem5::cva6'
+    type = 'picorv32'
+    cxx_header = "dev/riscv/picorv32.hh"
+    cxx_class = 'gem5::picorv32'
 
     # CLINT
     clint = Param.Clint(Clint(pio_addr=0x2000000), "CLINT")

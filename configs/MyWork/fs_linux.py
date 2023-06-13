@@ -48,7 +48,7 @@ from m5.objects import *
 from m5.util import addToPath, fatal, warn
 from m5.util.fdthelper import *
 
-addToPath('../../')
+addToPath('../')
 
 from ruby import Ruby
 
@@ -150,6 +150,7 @@ mdesc = SysConfig(disks=args.disk_image, rootdev=args.root_device,
 system.mem_mode = mem_mode
 system.mem_ranges = [AddrRange(start=0x80000000, size=mdesc.mem())]
 
+
 if args.bare_metal:
     system.workload = RiscvBareMetal()
     system.workload.bootloader = args.kernel
@@ -162,12 +163,13 @@ system.membus = MemBus()
 
 system.system_port = system.membus.cpu_side_ports
 
-# picorv32 Platform
-system.platform = picorv32()
+# HiFive Platform
+system.platform = HiFive()
 
 # RTCCLK (Set to 100MHz for faster simulation)
 system.platform.rtc = RiscvRTC(frequency=Frequency("100MHz"))
 system.platform.clint.int_pin = system.platform.rtc.int_pin
+system.platform.pci_host.pio = system.iobus.mem_side_ports
 
 # VirtIOMMIO
 if args.disk_image:

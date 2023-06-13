@@ -38,10 +38,10 @@ from gem5.resources.resource import AbstractResource
 from gem5.components.memory import SingleChannelDDR3_1600
 from gem5.utils.requires import requires
 from gem5.isas import ISA
-from python.gem5.prebuilt.cva6.cva6_cache import (
-    cva6CacheHierarchy,
+from python.gem5.prebuilt.picorv32.picorv32_cache import (
+    picorv32CacheHierarchy,
 )
-from python.gem5.prebuilt.cva6.cva6_proc import U74Processor
+from python.gem5.prebuilt.picorv32.picorv32_proc import U74Processor
 
 import m5
 
@@ -53,7 +53,7 @@ from m5.objects import (
     AddrRange,
     IOXBar,
     RiscvRTC,
-    cva6,
+    picorv32,
     CowDiskImage,
     RawDiskImage,
     RiscvMmioVirtIO,
@@ -87,11 +87,11 @@ def U74Memory():
         )
     return memory
 
-class cva6Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
+class picorv32Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
     """
     A board capable of full system simulation for RISC-V
 
-    At a high-level, this is based on the cva6 Unmatched board from SiFive.
+    At a high-level, this is based on the picorv32 Unmatched board from SiFive.
 
     This board assumes that you will be booting Linux for fullsystem emulation.
 
@@ -115,7 +115,7 @@ class cva6Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
         requires(isa_required=ISA.RISCV)
         self._fs = is_fs
 
-        cache_hierarchy = cva6CacheHierarchy()
+        cache_hierarchy = picorv32CacheHierarchy()
 
         memory = U74Memory()
 
@@ -133,7 +133,7 @@ class cva6Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
             self.workload = RiscvLinux()
 
             # Contains a CLINT, PLIC, UART, and some functions for the dtb, etc.
-            self.platform = cva6()
+            self.platform = picorv32()
             # Note: This only works with single threaded cores.
             self.platform.plic.n_contexts = self.processor.get_num_cores() * 2
             self.platform.attachPlic()
@@ -243,7 +243,7 @@ class cva6Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
             return self.iobus
         else:
             raise NotImplementedError(
-                "cva6Board does not have an IO bus. "
+                "picorv32Board does not have an IO bus. "
                 "Use `has_io_bus()` to check this."
             )
 
@@ -257,7 +257,7 @@ class cva6Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
             return self.iobus.mem_side_ports
         else:
             raise NotImplementedError(
-            "cva6Board does not have any I/O ports. Use has_coherent_io to "
+            "picorv32Board does not have any I/O ports. Use has_coherent_io to "
             "check this."
         )
 

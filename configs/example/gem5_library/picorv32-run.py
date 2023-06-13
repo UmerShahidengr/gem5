@@ -24,37 +24,50 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from gem5.utils.override import overrides
-from gem5.components.boards.mem_mode import MemMode
+import argparse
+from gem5.resources.resource import Resource, CustomResource
+from gem5.simulate.simulator import Simulator
+from python.gem5.prebuilt.picorv32.picorv32_board import picorv32Board
 
-from m5.util import warn
+# collect optional CLI arg for RISCV binary to run
+parser = argparse.ArgumentParser(description="Binary to run on system")
+parser.add_argument(
+    "workload", type=str, help="The disk image or RV binary to execute"
+)
+parser.add_argument(
+    "--argv", type=str, help="CLI argument to the binary",
+    default=""
+)
+parser.add_argument(
+    "--fullsystem", type=bool, help="Set the board to FS mode",
+    default=False
+)
+args = parser.parse_args()
 
-from gem5.components.processors.abstract_processor import AbstractProcessor
-from gem5.components.processors.cpu_types import CPUTypes
-from gem5.components.boards.abstract_board import AbstractBoard
-from python.gem5.prebuilt.cva6.cva6_core import U74Core
+board = picorv32Board(clk_freq="1.2GHz", is_fs=args.fullsystem)
 
+# Set FS or SE mode workload depending on user input
+if args.fullsystem:
+    command = "echo 'This is running on U74 CPU core.';" \
+        + "sleep 1;" \
+        + "m5 exit;"
+    if args.workload in ["riscv-disk-img", "riscv-ubuntu-20.04-img"]:
+        board.set_kernel_disk_workload(
+            kernel=Resource("riscv-bootloader-vmlinux-5.10"),
+            disk_image=Resource(args.workload),
+            readfile_contents=command,
+        )
+    else:
+        board.set_kernel_disk_workload(
+            kernel=CustomResource("riscv-bootloader-vmlinux-5.10"),
+            disk_image=CustomResource(args.workload),
+            readfile_contents=command,
+        )
+else:
+    board.set_se_binary_workload(
+        CustomResource(args.workload),
+        arguments=args.argv.split(" "),
+    )
 
-class U74Processor(AbstractProcessor):
-    """
-    A U74Processor contains a number of cores of U74Core.
-    """
-
-    def __init__(
-        self,
-        is_fs: bool,
-    ) -> None:
-        self._cpu_type = CPUTypes.MINOR
-        super().__init__(cores=self._create_cores(is_fs))
-
-    def _create_cores(self, is_fs: bool):
-        if is_fs:
-            num_cores = 1
-        else:
-            num_cores = 1
-        return [U74Core(core_id=i) for i in range(num_cores)]
-
-    @overrides(AbstractProcessor)
-    def incorporate_processor(self, board: AbstractBoard) -> None:
-        # Set the memory mode.
-        board.set_mem_mode(MemMode.TIMING)
+simulator = Simulator(board=board)
+simulator.run()

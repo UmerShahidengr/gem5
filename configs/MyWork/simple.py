@@ -1,7 +1,4 @@
-# -*- mode:python -*-
-
-# Copyright (c) 2021 Huawei International
-# Copyright (c) 2022 EXAscale Performance SYStems (EXAPSYS)
+# Copyright (c) 2015 Jason Power
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,28 +24,51 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Import('*')
 
-SimObject('picorv32.py', sim_objects=['picorv32', 'GenericRiscvPciHost'],
-          tags='riscv isa')
-SimObject('LupV.py', sim_objects=['LupV'], tags='riscv isa')
-SimObject('Clint.py', sim_objects=['Clint'], tags='riscv isa')
-SimObject('PlicDevice.py', sim_objects=['PlicIntDevice'], tags='riscv isa')
-SimObject('Plic.py', sim_objects=['Plic'], tags='riscv isa')
-SimObject('RTC.py', sim_objects=['RiscvRTC'], tags='riscv isa')
-SimObject('RiscvVirtIOMMIO.py', sim_objects=['RiscvMmioVirtIO'],
-    tags='riscv isa')
+import m5
+from m5.objects import *
 
-DebugFlag('Clint', tags='riscv isa')
-DebugFlag('Plic', tags='riscv isa')
-DebugFlag('VirtIOMMIO', tags='riscv isa')
+system = System()
 
-Source('pci_host.cc', tags='riscv isa')
+system.clk_domain = SrcClockDomain()
+system.clk_domain.clock = "1GHz"
+system.clk_domain.voltage_domain = VoltageDomain()
 
-Source('picorv32.cc', tags='riscv isa')
-Source('lupv.cc', tags='riscv isa')
-Source('clint.cc', tags='riscv isa')
-Source('plic_device.cc', tags='riscv isa')
-Source('plic.cc', tags='riscv isa')
-Source('rtc.cc', tags='riscv isa')
-Source('vio_mmio.cc', tags='riscv isa')
+system.mem_mode = "timing"
+system.mem_ranges = [AddrRange("8192MB")]
+system.cpu = RiscvMinorCPU()
+
+system.membus = SystemXBar()
+
+system.cpu.icache_port = system.membus.cpu_side_ports
+system.cpu.dcache_port = system.membus.cpu_side_ports
+
+system.cpu.createInterruptController()
+
+system.mem_ctrl = MemCtrl()
+system.mem_ctrl.dram = DDR3_1600_8x8()
+system.mem_ctrl.dram.range = system.mem_ranges[0]
+system.mem_ctrl.port = system.membus.mem_side_ports
+
+system.system_port = system.membus.cpu_side_ports
+
+thispath = os.path.dirname(os.path.realpath(__file__))
+binary = os.path.join(
+    thispath,
+    "../../",
+    "gem5-resources/src/microbenchmarks/control_complex",
+)
+
+system.workload = SEWorkload.init_compatible(binary)
+
+process = Process()
+process.cmd = [binary]
+system.cpu.workload = process
+system.cpu.createThreads()
+
+root = Root(full_system=False, system=system)
+m5.instantiate()
+
+print("Beginning simulation!")
+exit_event = m5.simulate()
+print("Exiting @ tick %i because %s" % (m5.curTick(), exit_event.getCause()))
