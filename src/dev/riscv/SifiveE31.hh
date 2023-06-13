@@ -35,20 +35,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __DEV_RISCV_picorv32_HH__
-#define __DEV_RISCV_picorv32_HH__
+#ifndef __DEV_RISCV_SifiveE31_HH__
+#define __DEV_RISCV_SifiveE31_HH__
 
 #include "dev/platform.hh"
 #include "dev/riscv/clint.hh"
 #include "dev/riscv/plic.hh"
-#include "params/picorv32.hh"
+#include "params/SifiveE31.hh"
 
 namespace gem5
 {
 
 using namespace RiscvISA;
 
-class picorv32 : public Platform
+class SifiveE31 : public Platform
 {
   public:
     Clint *clint;
@@ -56,8 +56,8 @@ class picorv32 : public Platform
     int uartIntID;
 
   public:
-    typedef picorv32Params Params;
-    picorv32(const Params &params);
+    typedef SifiveE31Params Params;
+    SifiveE31(const Params &params);
 
     void postConsoleInt() override;
 
@@ -74,4 +74,4 @@ class picorv32 : public Platform
 
 } // namespace gem5
 
-#endif  // __DEV_RISCV_picorv32_HH__
+#endif  // __DEV_RISCV_SifiveE31_HH__

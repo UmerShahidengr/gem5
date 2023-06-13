@@ -32,7 +32,7 @@ from m5.util import warn
 from gem5.components.processors.abstract_processor import AbstractProcessor
 from gem5.components.processors.cpu_types import CPUTypes
 from gem5.components.boards.abstract_board import AbstractBoard
-from python.gem5.prebuilt.picorv32.picorv32_core import U74Core
+from python.gem5.prebuilt.SifiveE31.SifiveE31_core import U74Core
 
 
 class U74Processor(AbstractProcessor):

@@ -85,14 +85,14 @@ class AbstractTwoLevelCacheHierarchy:
         self._l1d_size = l1d_size
         self._l1d_assoc = l1d_assoc
 
-class picorv32CacheHierarchy(
+class SifiveE31CacheHierarchy(
     AbstractClassicCacheHierarchy, AbstractTwoLevelCacheHierarchy
 ):
     """
 
     A cache setup where each core has a private L1 Data and Instruction Cache,
     and a private L2 cache.
-    The picorv32 board has a partially inclusive cache hierarchy, hence this hierarchy is chosen.
+    The SifiveE31 board has a partially inclusive cache hierarchy, hence this hierarchy is chosen.
     The details of the cache hierarchy are in Table 7, page 36 of the datasheet.
 
     - L1 Instruction Cache:

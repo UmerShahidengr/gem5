@@ -39,7 +39,7 @@
 #include "dev/riscv/vio_mmio.hh"
 
 #include "debug/VirtIOMMIO.hh"
-#include "dev/riscv/picorv32.hh"
+#include "dev/riscv/SifiveE31.hh"
 #include "mem/packet_access.hh"
 #include "params/RiscvMmioVirtIO.hh"
 

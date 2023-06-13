@@ -35,11 +35,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "dev/riscv/picorv32.hh"
+#include "dev/riscv/SifiveE31.hh"
 
 #include "dev/riscv/clint.hh"
 #include "dev/riscv/plic.hh"
-#include "params/picorv32.hh"
+#include "params/SifiveE31.hh"
 #include "sim/system.hh"
 
 namespace gem5
@@ -47,7 +47,7 @@ namespace gem5
 
 using namespace RiscvISA;
 
-picorv32::picorv32(const Params &params) :
+SifiveE31::SifiveE31(const Params &params) :
     Platform(params),
     clint(params.clint), plic(params.plic),
     uartIntID(params.uart_int_id)
@@ -55,36 +55,36 @@ picorv32::picorv32(const Params &params) :
 }
 
 void
-picorv32::postConsoleInt()
+SifiveE31::postConsoleInt()
 {
     plic->post(uartIntID);
 }
 
 void
-picorv32::clearConsoleInt()
+SifiveE31::clearConsoleInt()
 {
     plic->clear(uartIntID);
 }
 
 void
-picorv32::postPciInt(int line)
+SifiveE31::postPciInt(int line)
 {
     plic->post(line);
 }
 
 void
-picorv32::clearPciInt(int line)
+SifiveE31::clearPciInt(int line)
 {
     plic->clear(line);
 }
 
 void
-picorv32::serialize(CheckpointOut &cp) const
+SifiveE31::serialize(CheckpointOut &cp) const
 {
 }
 
 void
-picorv32::unserialize(CheckpointIn &cp)
+SifiveE31::unserialize(CheckpointIn &cp)
 {
 }
 

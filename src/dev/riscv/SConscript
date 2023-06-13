@@ -29,7 +29,7 @@
 
 Import('*')
 
-SimObject('picorv32.py', sim_objects=['picorv32', 'GenericRiscvPciHost'],
+SimObject('SifiveE31.py', sim_objects=['SifiveE31', 'GenericRiscvPciHost'],
           tags='riscv isa')
 SimObject('LupV.py', sim_objects=['LupV'], tags='riscv isa')
 SimObject('Clint.py', sim_objects=['Clint'], tags='riscv isa')
@@ -45,7 +45,7 @@ DebugFlag('VirtIOMMIO', tags='riscv isa')
 
 Source('pci_host.cc', tags='riscv isa')
 
-Source('picorv32.cc', tags='riscv isa')
+Source('SifiveE31.cc', tags='riscv isa')
 Source('lupv.cc', tags='riscv isa')
 Source('clint.cc', tags='riscv isa')
 Source('plic_device.cc', tags='riscv isa')
