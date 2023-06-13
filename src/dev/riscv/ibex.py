@@ -59,11 +59,11 @@ class GenericRiscvPciHost(GenericPciHost):
     # on/off the fdt dma-coherent flag when doing dtb autogeneration
     _dma_coherent = True
 
-class picorv32(Platform):
-    """picorv32 Platform
+class ibex(Platform):
+    """ibex Platform
 
     Implementation:
-        This is the base class for SiFive's picorv32
+        This is the base class for SiFive's ibex
         board series. It contains the CLINT and PLIC
         interrupt controllers, Uart and Disk.
 
@@ -74,7 +74,7 @@ class picorv32(Platform):
 
     Setup:
         The following sections outline the required
-        setup for a RISC-V picorv32 platform. See
+        setup for a RISC-V ibex platform. See
         configs/example/riscv/fs_linux.py for example.
 
     Driving CLINT:
@@ -96,7 +96,7 @@ class picorv32(Platform):
         up the PLIC interrupt source count.
 
     Uart:
-        The picorv32 platform also has an uart_int_id.
+        The ibex platform also has an uart_int_id.
         This is because Uart8250 uses postConsoleInt
         instead of postPciInt. In the future if a Uart
         that inherits PlicIntDevice is implemented,
@@ -110,9 +110,9 @@ class picorv32(Platform):
         each CPU (which allows them to differ). See
         fs_linux.py for setup example.
     """
-    type = 'picorv32'
-    cxx_header = "dev/riscv/picorv32.hh"
-    cxx_class = 'gem5::picorv32'
+    type = 'ibex'
+    cxx_header = "dev/riscv/ibex.hh"
+    cxx_class = 'gem5::ibex'
 
     # CLINT
     clint = Param.Clint(Clint(pio_addr=0x2000000), "CLINT")

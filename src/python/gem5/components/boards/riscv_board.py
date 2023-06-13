@@ -49,7 +49,7 @@ from m5.objects import (
     AddrRange,
     IOXBar,
     RiscvRTC,
-    picorv32,
+    ibex,
     GenericRiscvPciHost,
     IGbE_e1000,
     CowDiskImage,
@@ -75,7 +75,7 @@ class RiscvBoard(AbstractSystemBoard, KernelDiskWorkload):
     """
     A board capable of full system simulation for RISC-V
 
-    At a high-level, this is based on the picorv32 Unmatched board from SiFive.
+    At a high-level, this is based on the ibex Unmatched board from SiFive.
 
     This board assumes that you will be booting Linux.
 
@@ -102,7 +102,7 @@ class RiscvBoard(AbstractSystemBoard, KernelDiskWorkload):
         self.workload = RiscvLinux()
 
         # Contains a CLINT, PLIC, UART, and some functions for the dtb, etc.
-        self.platform = picorv32()
+        self.platform = ibex()
         # Note: This only works with single threaded cores.
         self.platform.plic.n_contexts = self.processor.get_num_cores() * 2
         self.platform.attachPlic()

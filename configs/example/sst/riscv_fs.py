@@ -69,7 +69,7 @@ def generateDtb(system):
     fdt.writeDtsFile(path.join(m5.options.outdir, 'device.dts'))
     fdt.writeDtbFile(path.join(m5.options.outdir, 'device.dtb'))
 
-def createpicorv32Platform(system):
+def createibexPlatform(system):
     # Since the latency from CPU to the bus was set in SST, additional latency
     # is undesirable.
     system.membus = NoncoherentXBar(
@@ -91,7 +91,7 @@ def createpicorv32Platform(system):
             system.membus.cpu_side_ports, system.membus.cpu_side_ports)
 
 
-    system.platform = picorv32()
+    system.platform = ibex()
 
     system.platform.pci_host.pio = system.membus.mem_side_ports
 
@@ -142,7 +142,7 @@ system.mem_ranges = [AddrRange(start=0x80000000, size=memory_size)]
 system.cpu = [TimingSimpleCPU(cpu_id=i) for i in range(1)]
 system.mem_mode = 'timing'
 
-createpicorv32Platform(system)
+createibexPlatform(system)
 
 system.system_outgoing_bridge = OutgoingRequestBridge()
 system.system_port = system.system_outgoing_bridge.port

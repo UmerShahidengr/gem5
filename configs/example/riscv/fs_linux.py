@@ -162,8 +162,8 @@ system.membus = MemBus()
 
 system.system_port = system.membus.cpu_side_ports
 
-# picorv32 Platform
-system.platform = picorv32()
+# ibex Platform
+system.platform = ibex()
 
 # RTCCLK (Set to 100MHz for faster simulation)
 system.platform.rtc = RiscvRTC(frequency=Frequency("100MHz"))
