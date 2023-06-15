@@ -36,6 +36,7 @@ from gem5.components.cachehierarchies.abstract_two_level_cache_hierarchy import 
 from gem5.components.cachehierarchies.classic.caches.l1dcache import L1DCache
 from gem5.components.cachehierarchies.classic.caches.l1icache import L1ICache
 from gem5.components.boards.abstract_board import AbstractBoard
+from gem5.components.cachehierarchies.classic.caches.mmu_cache import MMUCache
 from gem5.isas import ISA
 from m5.objects import Cache, BaseXBar, SystemXBar, BadAddr, Port
 
@@ -150,6 +151,17 @@ class cva6CacheHierarchy(
             for i in range(board.get_processor().get_num_cores())
         ]
 
+        # ITLB Page walk caches
+        self.iptw_caches = [
+            MMUCache(size="4KiB")
+            for _ in range(board.get_processor().get_num_cores())
+        ]
+        # DTLB Page walk caches
+        self.dptw_caches = [
+            MMUCache(size="4KiB")
+            for _ in range(board.get_processor().get_num_cores())
+        ]
+
         if board.has_coherent_io():
             self._setup_io_cache(board)
 
@@ -161,6 +173,12 @@ class cva6CacheHierarchy(
             self.membus.cpu_side_ports = self.l1icaches[i].mem_side
             self.membus.cpu_side_ports = self.l1dcaches[i].mem_side
 
+            self.membus.cpu_side_ports = self.iptw_caches[i].mem_side
+            self.membus.cpu_side_ports = self.dptw_caches[i].mem_side 
+
+            cpu.connect_walker_ports(
+                self.iptw_caches[i].cpu_side, self.dptw_caches[i].cpu_side
+            )
 
             if board.get_processor().get_isa() == ISA.X86:
                 int_req_port = self.membus.mem_side_ports

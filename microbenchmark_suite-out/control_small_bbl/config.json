@@ -59,6 +59,222 @@
             "path": "board.cache_hierarchy",
             "eventq_index": 0,
             "thermal_domain": null,
+            "dptw_caches": [
+                {
+                    "type": "Cache",
+                    "cxx_class": "gem5::Cache",
+                    "name": "dptw_caches",
+                    "path": "board.cache_hierarchy.dptw_caches",
+                    "addr_ranges": [
+                        "0:18446744073709551615"
+                    ],
+                    "assoc": 4,
+                    "clk_domain": "board.clk_domain",
+                    "clusivity": "mostly_incl",
+                    "compressor": null,
+                    "data_latency": 1,
+                    "demand_mshr_reserve": 1,
+                    "eventq_index": 0,
+                    "is_read_only": false,
+                    "max_miss_count": 0,
+                    "move_contractions": true,
+                    "mshrs": 20,
+                    "power_model": [],
+                    "power_state": {
+                        "type": "PowerState",
+                        "cxx_class": "gem5::PowerState",
+                        "name": "power_state",
+                        "path": "board.cache_hierarchy.dptw_caches.power_state",
+                        "clk_gate_bins": 20,
+                        "clk_gate_max": 1000000000000,
+                        "clk_gate_min": 1000,
+                        "default_state": "UNDEFINED",
+                        "eventq_index": 0,
+                        "leaders": [],
+                        "possible_states": []
+                    },
+                    "prefetch_on_access": false,
+                    "prefetch_on_pf_hit": false,
+                    "prefetcher": null,
+                    "replace_expansions": true,
+                    "replacement_policy": {
+                        "type": "LRURP",
+                        "cxx_class": "gem5::replacement_policy::LRU",
+                        "name": "replacement_policy",
+                        "path": "board.cache_hierarchy.dptw_caches.replacement_policy",
+                        "eventq_index": 0
+                    },
+                    "response_latency": 1,
+                    "sequential_access": false,
+                    "size": 4096,
+                    "system": "board",
+                    "tag_latency": 1,
+                    "tags": {
+                        "type": "BaseSetAssoc",
+                        "cxx_class": "gem5::BaseSetAssoc",
+                        "name": "tags",
+                        "path": "board.cache_hierarchy.dptw_caches.tags",
+                        "assoc": 4,
+                        "block_size": 64,
+                        "clk_domain": "board.clk_domain",
+                        "entry_size": 64,
+                        "eventq_index": 0,
+                        "indexing_policy": {
+                            "type": "SetAssociative",
+                            "cxx_class": "gem5::SetAssociative",
+                            "name": "indexing_policy",
+                            "path": "board.cache_hierarchy.dptw_caches.tags.indexing_policy",
+                            "assoc": 4,
+                            "entry_size": 64,
+                            "eventq_index": 0,
+                            "size": 4096
+                        },
+                        "power_model": [],
+                        "power_state": {
+                            "type": "PowerState",
+                            "cxx_class": "gem5::PowerState",
+                            "name": "power_state",
+                            "path": "board.cache_hierarchy.dptw_caches.tags.power_state",
+                            "clk_gate_bins": 20,
+                            "clk_gate_max": 1000000000000,
+                            "clk_gate_min": 1000,
+                            "default_state": "UNDEFINED",
+                            "eventq_index": 0,
+                            "leaders": [],
+                            "possible_states": []
+                        },
+                        "replacement_policy": "board.cache_hierarchy.dptw_caches.replacement_policy",
+                        "sequential_access": false,
+                        "size": 4096,
+                        "system": "board",
+                        "tag_latency": 1,
+                        "warmup_percentage": 0
+                    },
+                    "tgts_per_mshr": 12,
+                    "warmup_percentage": 0,
+                    "write_allocator": null,
+                    "write_buffers": 8,
+                    "writeback_clean": true,
+                    "cpu_side": {
+                        "role": "GEM5 RESPONDER",
+                        "peer": "board.processor.cores.core.mmu.dtb.walker.port",
+                        "is_source": "False"
+                    },
+                    "mem_side": {
+                        "role": "GEM5 REQUESTOR",
+                        "peer": "board.cache_hierarchy.membus.cpu_side_ports[4]",
+                        "is_source": "True"
+                    }
+                }
+            ],
+            "iptw_caches": [
+                {
+                    "type": "Cache",
+                    "cxx_class": "gem5::Cache",
+                    "name": "iptw_caches",
+                    "path": "board.cache_hierarchy.iptw_caches",
+                    "addr_ranges": [
+                        "0:18446744073709551615"
+                    ],
+                    "assoc": 4,
+                    "clk_domain": "board.clk_domain",
+                    "clusivity": "mostly_incl",
+                    "compressor": null,
+                    "data_latency": 1,
+                    "demand_mshr_reserve": 1,
+                    "eventq_index": 0,
+                    "is_read_only": false,
+                    "max_miss_count": 0,
+                    "move_contractions": true,
+                    "mshrs": 20,
+                    "power_model": [],
+                    "power_state": {
+                        "type": "PowerState",
+                        "cxx_class": "gem5::PowerState",
+                        "name": "power_state",
+                        "path": "board.cache_hierarchy.iptw_caches.power_state",
+                        "clk_gate_bins": 20,
+                        "clk_gate_max": 1000000000000,
+                        "clk_gate_min": 1000,
+                        "default_state": "UNDEFINED",
+                        "eventq_index": 0,
+                        "leaders": [],
+                        "possible_states": []
+                    },
+                    "prefetch_on_access": false,
+                    "prefetch_on_pf_hit": false,
+                    "prefetcher": null,
+                    "replace_expansions": true,
+                    "replacement_policy": {
+                        "type": "LRURP",
+                        "cxx_class": "gem5::replacement_policy::LRU",
+                        "name": "replacement_policy",
+                        "path": "board.cache_hierarchy.iptw_caches.replacement_policy",
+                        "eventq_index": 0
+                    },
+                    "response_latency": 1,
+                    "sequential_access": false,
+                    "size": 4096,
+                    "system": "board",
+                    "tag_latency": 1,
+                    "tags": {
+                        "type": "BaseSetAssoc",
+                        "cxx_class": "gem5::BaseSetAssoc",
+                        "name": "tags",
+                        "path": "board.cache_hierarchy.iptw_caches.tags",
+                        "assoc": 4,
+                        "block_size": 64,
+                        "clk_domain": "board.clk_domain",
+                        "entry_size": 64,
+                        "eventq_index": 0,
+                        "indexing_policy": {
+                            "type": "SetAssociative",
+                            "cxx_class": "gem5::SetAssociative",
+                            "name": "indexing_policy",
+                            "path": "board.cache_hierarchy.iptw_caches.tags.indexing_policy",
+                            "assoc": 4,
+                            "entry_size": 64,
+                            "eventq_index": 0,
+                            "size": 4096
+                        },
+                        "power_model": [],
+                        "power_state": {
+                            "type": "PowerState",
+                            "cxx_class": "gem5::PowerState",
+                            "name": "power_state",
+                            "path": "board.cache_hierarchy.iptw_caches.tags.power_state",
+                            "clk_gate_bins": 20,
+                            "clk_gate_max": 1000000000000,
+                            "clk_gate_min": 1000,
+                            "default_state": "UNDEFINED",
+                            "eventq_index": 0,
+                            "leaders": [],
+                            "possible_states": []
+                        },
+                        "replacement_policy": "board.cache_hierarchy.iptw_caches.replacement_policy",
+                        "sequential_access": false,
+                        "size": 4096,
+                        "system": "board",
+                        "tag_latency": 1,
+                        "warmup_percentage": 0
+                    },
+                    "tgts_per_mshr": 12,
+                    "warmup_percentage": 0,
+                    "write_allocator": null,
+                    "write_buffers": 8,
+                    "writeback_clean": true,
+                    "cpu_side": {
+                        "role": "GEM5 RESPONDER",
+                        "peer": "board.processor.cores.core.mmu.itb.walker.port",
+                        "is_source": "False"
+                    },
+                    "mem_side": {
+                        "role": "GEM5 REQUESTOR",
+                        "peer": "board.cache_hierarchy.membus.cpu_side_ports[3]",
+                        "is_source": "True"
+                    }
+                }
+            ],
             "l1dcaches": [
                 {
                     "type": "Cache",
@@ -490,7 +706,9 @@
                     "peer": [
                         "board.system_port",
                         "board.cache_hierarchy.l1icaches.mem_side",
-                        "board.cache_hierarchy.l1dcaches.mem_side"
+                        "board.cache_hierarchy.l1dcaches.mem_side",
+                        "board.cache_hierarchy.iptw_caches.mem_side",
+                        "board.cache_hierarchy.dptw_caches.mem_side"
                     ],
                     "is_source": "False"
                 },
@@ -1623,7 +1841,12 @@
                                         "leaders": [],
                                         "possible_states": []
                                     },
-                                    "system": "board"
+                                    "system": "board",
+                                    "port": {
+                                        "role": "GEM5 REQUESTOR",
+                                        "peer": "board.cache_hierarchy.dptw_caches.cpu_side",
+                                        "is_source": "True"
+                                    }
                                 }
                             },
                             "eventq_index": 0,
@@ -1662,7 +1885,12 @@
                                         "leaders": [],
                                         "possible_states": []
                                     },
-                                    "system": "board"
+                                    "system": "board",
+                                    "port": {
+                                        "role": "GEM5 REQUESTOR",
+                                        "peer": "board.cache_hierarchy.iptw_caches.cpu_side",
+                                        "is_source": "True"
+                                    }
                                 }
                             },
                             "pma_checker": {
