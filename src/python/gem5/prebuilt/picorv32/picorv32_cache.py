@@ -30,17 +30,15 @@ from gem5.components.cachehierarchies.abstract_cache_hierarchy import (
 from gem5.components.cachehierarchies.classic.abstract_classic_cache_hierarchy import (
     AbstractClassicCacheHierarchy,
 )
-from gem5.components.cachehierarchies.abstract_two_level_cache_hierarchy import (
-    AbstractTwoLevelCacheHierarchy,
-)
+
 from gem5.components.cachehierarchies.classic.caches.l1dcache import L1DCache
 from gem5.components.cachehierarchies.classic.caches.l1icache import L1ICache
+from gem5.components.cachehierarchies.classic.caches.mmu_cache import MMUCache
 from gem5.components.boards.abstract_board import AbstractBoard
 from gem5.isas import ISA
 from m5.objects import Cache, BaseXBar, SystemXBar, BadAddr, Port
 
 from gem5.utils.override import *
-
 
 class AbstractTwoLevelCacheHierarchy:
     """
@@ -92,7 +90,7 @@ class picorv32CacheHierarchy(
 
     A cache setup where each core has a private L1 Data and Instruction Cache,
     and a private L2 cache.
-    The picorv32 board has a partially inclusive cache hierarchy, hence this hierarchy is chosen.
+    The cva6 board has a partially inclusive cache hierarchy, hence this hierarchy is chosen.
     The details of the cache hierarchy are in Table 7, page 36 of the datasheet.
 
     - L1 Instruction Cache:
@@ -114,13 +112,13 @@ class picorv32CacheHierarchy(
         AbstractClassicCacheHierarchy.__init__(self=self)
         AbstractTwoLevelCacheHierarchy.__init__(
             self,
-            l1i_size="16kB",
+            l1i_size="8kB",
             l1i_assoc=4,
-            l1d_size="16kB",
+            l1d_size="8kB",
             l1d_assoc=4,
         )
 
-        self.membus = SystemXBar(width=64)
+        self.membus = SystemXBar(width=32)
         self.membus.badaddr_responder = BadAddr()
         self.membus.default = self.membus.badaddr_responder.pio
 
@@ -149,6 +147,16 @@ class picorv32CacheHierarchy(
             L1DCache(size=self._l1d_size, assoc=self._l1d_assoc)
             for i in range(board.get_processor().get_num_cores())
         ]
+        # ITLB Page walk caches
+        self.iptw_caches = [
+            MMUCache(size="4KiB")
+            for _ in range(board.get_processor().get_num_cores())
+        ]
+        # DTLB Page walk caches
+        self.dptw_caches = [
+            MMUCache(size="4KiB")
+            for _ in range(board.get_processor().get_num_cores())
+        ]
 
         if board.has_coherent_io():
             self._setup_io_cache(board)
@@ -157,10 +165,15 @@ class picorv32CacheHierarchy(
 
             cpu.connect_icache(self.l1icaches[i].cpu_side)
             cpu.connect_dcache(self.l1dcaches[i].cpu_side)
-
+            
             self.membus.cpu_side_ports = self.l1icaches[i].mem_side
             self.membus.cpu_side_ports = self.l1dcaches[i].mem_side
+            self.membus.cpu_side_ports = self.iptw_caches[i].mem_side
+            self.membus.cpu_side_ports = self.dptw_caches[i].mem_side
 
+            cpu.connect_walker_ports(
+                self.iptw_caches[i].cpu_side, self.dptw_caches[i].cpu_side
+            )
 
             if board.get_processor().get_isa() == ISA.X86:
                 int_req_port = self.membus.mem_side_ports
@@ -183,3 +196,4 @@ class picorv32CacheHierarchy(
         )
         self.iocache.mem_side = self.membus.cpu_side_ports
         self.iocache.cpu_side = board.get_mem_side_coherent_io_port()
+

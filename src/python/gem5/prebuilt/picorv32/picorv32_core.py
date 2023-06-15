@@ -31,6 +31,7 @@ from gem5.isas import ISA
 from gem5.utils.override import overrides
 from m5.objects.RiscvCPU import RiscvMinorCPU
 from m5.objects import (
+    BaseMMU,
     Port,
     BaseCPU,
     Process,
@@ -139,7 +140,7 @@ class U74CPU(RiscvMinorCPU):
 
 class U74Core(AbstractCore):
     """
-        U74Core models the core of the picorv32 Unmatched board.
+        U74Core models the core of the cva6 Unmatched board.
         The core has a single thread.
         The latencies of the functional units are set to values found in Table 8 on page 40.
           - IntFU: 1 cycle
@@ -151,7 +152,7 @@ class U74Core(AbstractCore):
           - RASSize: 6 entries
           - IndirectSets: 8 sets
           - localHistoryTableSize: 4096 B
-        NOTE: The BHT of the picorv32 Board is 3.6KiB but gem5 requires a power of 2, so the BHT is 4096B.
+        NOTE: The BHT of the cva6 Board is 3.6KiB but gem5 requires a power of 2, so the BHT is 4096B.
     """
     def __init__(
         self,
@@ -179,6 +180,10 @@ class U74Core(AbstractCore):
         self.core.dcache_port = port
 
     @overrides(AbstractCore)
+    def connect_walker_ports(self, port1: Port, port2: Port) -> None:
+        self.core.mmu.connectWalkerPorts(port1, port2)
+
+    @overrides(AbstractCore)
     def set_workload(self, process: Process) -> None:
         self.core.workload = process
 
@@ -193,4 +198,10 @@ class U74Core(AbstractCore):
         interrupt_responce: Optional[Port] = None,
     ) -> None:
         self.core.createInterruptController()
+
+    @overrides(AbstractCore)
+    def get_mmu(self) -> BaseMMU:
+        return self.core.mmu
+    
+
 

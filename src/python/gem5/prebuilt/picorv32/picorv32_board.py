@@ -35,13 +35,15 @@ from gem5.components.boards.abstract_system_board import AbstractSystemBoard
 from gem5.components.boards.kernel_disk_workload import KernelDiskWorkload
 from gem5.components.boards.se_binary_workload import SEBinaryWorkload
 from gem5.resources.resource import AbstractResource
-from gem5.components.memory import SingleChannelDDR3_1600
+from gem5.components.memory import SingleChannelDDR4_2400
 from gem5.utils.requires import requires
 from gem5.isas import ISA
 from python.gem5.prebuilt.picorv32.picorv32_cache import (
     picorv32CacheHierarchy,
 )
 from python.gem5.prebuilt.picorv32.picorv32_proc import U74Processor
+
+from gem5.isas import ISA
 
 import m5
 
@@ -78,10 +80,10 @@ def U74Memory():
     DDR4 Subsystem with 16GB of memory.
     Starts at 0x80000000.
     Details at: Section 23, page 195 of the datasheet.
-
+    
     return: ChanneledMemory
     """
-    memory = SingleChannelDDR3_1600("1GB")
+    memory = SingleChannelDDR4_2400("1GB")
     memory.set_memory_range(
             [AddrRange(start=0x80000000, size=memory.get_size())]
         )
@@ -95,7 +97,7 @@ class picorv32Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
 
     This board assumes that you will be booting Linux for fullsystem emulation.
 
-    The frequency of the RTC for the system is set to 1MHz.
+    The frequency of the RTC for the system is set to 1MHz. 
     Details can be found on page 77, section 7.1 of the datasheet.
 
     Datasheet for inbuilt params can be found here: https://sifive.cdn.prismic.io/sifive/1a82e600-1f93-4f41-b2d8-86ed8b16acba_fu740-c000-manual-v1p6.pdf
@@ -109,13 +111,16 @@ class picorv32Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
         """
 
         :param clk_freq: The clock frequency of the system
+        :param l2_size: The size of the L2 cache
         :param is_fs: Whether the system is a full system or not
 
         """
         requires(isa_required=ISA.RISCV)
         self._fs = is_fs
 
-        cache_hierarchy = picorv32CacheHierarchy()
+        cache_hierarchy = picorv32CacheHierarchy(
+  
+        )
 
         memory = U74Memory()
 
@@ -178,6 +183,9 @@ class picorv32Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
             #Add PCI
             self.platform.pci_host.pio = self.iobus.mem_side_ports
 
+            #Add Ethernet card
+            
+
             if self.get_cache_hierarchy().is_ruby():
                 for device in self._off_chip_devices + self._on_chip_devices:
                     device.pio = self.iobus.mem_side_ports
@@ -236,7 +244,7 @@ class picorv32Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
     @overrides(AbstractSystemBoard)
     def has_io_bus(self) -> bool:
         return self._fs
-
+    
     @overrides(AbstractSystemBoard)
     def get_io_bus(self) -> IOXBar:
         if self._fs:
@@ -246,11 +254,11 @@ class picorv32Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
                 "picorv32Board does not have an IO bus. "
                 "Use `has_io_bus()` to check this."
             )
-
+    
     @overrides(AbstractSystemBoard)
     def has_coherent_io(self) -> bool:
         return self._fs
-
+    
     @overrides(AbstractSystemBoard)
     def get_mem_side_coherent_io_port(self) -> Port:
         if self._fs:
@@ -260,7 +268,7 @@ class picorv32Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
             "picorv32Board does not have any I/O ports. Use has_coherent_io to "
             "check this."
         )
-
+    
     @overrides(AbstractSystemBoard)
     def _setup_memory_ranges(self):
         """
@@ -320,9 +328,9 @@ class picorv32Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
             node = FdtNode(f"cpu@{i}")
             node.append(FdtPropertyStrings("device_type", "cpu"))
             node.append(FdtPropertyWords("reg", state.CPUAddrCells(i)))
-            node.append(FdtPropertyStrings("mmu-type", "riscv,sv48"))
+            node.append(FdtPropertyStrings("mmu-type", "riscv,sv32"))
             node.append(FdtPropertyStrings("status", "okay"))
-            node.append(FdtPropertyStrings("riscv,isa", "rv64imafdc"))
+            node.append(FdtPropertyStrings("riscv,isa", "rv32imc"))
             # TODO: Should probably get this from the core.
             freq = self.clk_domain.clock[0].frequency
             node.append(FdtPropertyWords("clock-frequency", freq))
@@ -536,7 +544,7 @@ class picorv32Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
     @overrides(KernelDiskWorkload)
     def get_default_kernel_args(self) -> List[str]:
         return ["console=ttyS0", "root={root_value}", "ro"]
-
+    
     @overrides(KernelDiskWorkload)
     def set_kernel_disk_workload(
         self,
@@ -559,4 +567,4 @@ class picorv32Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
             kernel_args=kernel_args,
             exit_on_work_items=exit_on_work_items,
         )
-
+        
