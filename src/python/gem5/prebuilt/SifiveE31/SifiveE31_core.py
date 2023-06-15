@@ -31,6 +31,7 @@ from gem5.isas import ISA
 from gem5.utils.override import overrides
 from m5.objects.RiscvCPU import RiscvMinorCPU
 from m5.objects import (
+    BaseMMU,
     Port,
     BaseCPU,
     Process,
@@ -81,9 +82,9 @@ class U74FUPool(MinorFUPool):
 
 
 class U74BP(TournamentBP):
-    BTBEntries = 16
+    BTBEntries = 32              # is 28 but gem5 requires power of 2
     RASSize = 6
-    localHistoryTableSize = 4096  # is 3.6 KiB but gem5 requires power of 2
+    localHistoryTableSize = 512  # is 3.6 KiB but gem5 requires power of 2
 
     indirectBranchPred = SimpleIndirectPredictor()
     indirectBranchPred.indirectSets = 8
@@ -179,6 +180,10 @@ class U74Core(AbstractCore):
         self.core.dcache_port = port
 
     @overrides(AbstractCore)
+    def connect_walker_ports(self, port1: Port, port2: Port) -> None:
+        self.core.mmu.connectWalkerPorts(port1, port2)
+
+    @overrides(AbstractCore)
     def set_workload(self, process: Process) -> None:
         self.core.workload = process
 
@@ -194,3 +199,7 @@ class U74Core(AbstractCore):
     ) -> None:
         self.core.createInterruptController()
 
+    @overrides(AbstractCore)
+    def get_mmu(self) -> BaseMMU:
+        return self.core.mmu
+    

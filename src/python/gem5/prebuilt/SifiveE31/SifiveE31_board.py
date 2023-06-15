@@ -104,6 +104,10 @@ class SifiveE31Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
     def __init__(
         self,
         clk_freq: str,
+        l1d_size: str,
+        l1d_assoc: int,
+        l2_size: str,
+        l2_assoc: int,
         is_fs: bool,
     ) -> None:
         """
@@ -115,7 +119,12 @@ class SifiveE31Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
         requires(isa_required=ISA.RISCV)
         self._fs = is_fs
 
-        cache_hierarchy = SifiveE31CacheHierarchy()
+        cache_hierarchy = SifiveE31CacheHierarchy(
+            l1d_size=l1d_size,
+            l1d_assoc=l1d_assoc,
+            l2_size=l2_size,
+            l2_assoc=l2_assoc,
+        )
 
         memory = U74Memory()
 
@@ -320,9 +329,9 @@ class SifiveE31Board(AbstractSystemBoard, KernelDiskWorkload, SEBinaryWorkload):
             node = FdtNode(f"cpu@{i}")
             node.append(FdtPropertyStrings("device_type", "cpu"))
             node.append(FdtPropertyWords("reg", state.CPUAddrCells(i)))
-            node.append(FdtPropertyStrings("mmu-type", "riscv,sv48"))
+            node.append(FdtPropertyStrings("mmu-type", "riscv,sv32"))
             node.append(FdtPropertyStrings("status", "okay"))
-            node.append(FdtPropertyStrings("riscv,isa", "rv64imafdc"))
+            node.append(FdtPropertyStrings("riscv,isa", "rv32imac"))
             # TODO: Should probably get this from the core.
             freq = self.clk_domain.clock[0].frequency
             node.append(FdtPropertyWords("clock-frequency", freq))

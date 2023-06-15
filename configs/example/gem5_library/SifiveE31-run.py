@@ -44,7 +44,13 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-board = SifiveE31Board(clk_freq="1.2GHz", is_fs=args.fullsystem)
+board = SifiveE31Board(clk_freq="1.2GHz",             
+            l1d_size="16kB",
+            l1d_assoc=4,
+            l2_size="16kB",
+            l2_assoc=4,
+            is_fs=args.fullsystem
+        )
 
 # Set FS or SE mode workload depending on user input
 if args.fullsystem:

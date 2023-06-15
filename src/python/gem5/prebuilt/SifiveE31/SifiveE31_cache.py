@@ -35,55 +35,13 @@ from gem5.components.cachehierarchies.abstract_two_level_cache_hierarchy import 
 )
 from gem5.components.cachehierarchies.classic.caches.l1dcache import L1DCache
 from gem5.components.cachehierarchies.classic.caches.l1icache import L1ICache
+from gem5.components.cachehierarchies.classic.caches.l2cache import L2Cache
+from gem5.components.cachehierarchies.classic.caches.mmu_cache import MMUCache
 from gem5.components.boards.abstract_board import AbstractBoard
 from gem5.isas import ISA
-from m5.objects import Cache, BaseXBar, SystemXBar, BadAddr, Port
+from m5.objects import Cache, L2XBar, BaseXBar, SystemXBar, BadAddr, Port
 
 from gem5.utils.override import *
-
-
-class AbstractTwoLevelCacheHierarchy:
-    """
-    An abstract two-level hierarchy with a configurable L1 and L2 size and
-    associativity.
-    """
-
-    def __init__(
-        self,
-        l1i_size: str,
-        l1i_assoc: int,
-        l1d_size: str,
-        l1d_assoc: int,
-    ):
-        """
-        :param l1i_size: The size of the L1 Instruction cache (e.g. "32kB").
-
-        :type l1i_size: str
-
-        :param l1i_assoc:
-
-        :type l1i_assoc: int
-
-        :param l1dsize: The size of the LL1 Data cache (e.g. "32kB").
-
-        :type l1dsize: str
-
-        :param l1d_assoc:
-
-        :type l1d_assoc: int
-
-        :param l2_size: The size of the L2 cache (e.g., "256kB").
-
-        :type l2_size: str
-
-        :param l2_assoc:
-
-        :type l2_assoc: int
-        """
-        self._l1i_size = l1i_size
-        self._l1i_assoc = l1i_assoc
-        self._l1d_size = l1d_size
-        self._l1d_assoc = l1d_assoc
 
 class SifiveE31CacheHierarchy(
     AbstractClassicCacheHierarchy, AbstractTwoLevelCacheHierarchy
@@ -106,6 +64,10 @@ class SifiveE31CacheHierarchy(
 
     def __init__(
         self,
+        l1d_size: str,
+        l1d_assoc: int,
+        l2_size: str,
+        l2_assoc: int,
     ) -> None:
         """
         :param l2_size: The size of the L2 Cache (e.g., "256kB").
@@ -115,12 +77,14 @@ class SifiveE31CacheHierarchy(
         AbstractTwoLevelCacheHierarchy.__init__(
             self,
             l1i_size="16kB",
-            l1i_assoc=4,
-            l1d_size="16kB",
-            l1d_assoc=4,
+            l1i_assoc=2,
+            l1d_size=l1d_size,
+            l1d_assoc=l1d_assoc,
+            l2_size=l2_size,
+            l2_assoc=l2_assoc,
         )
 
-        self.membus = SystemXBar(width=64)
+        self.membus = SystemXBar(width=32)
         self.membus.badaddr_responder = BadAddr()
         self.membus.default = self.membus.badaddr_responder.pio
 
@@ -150,6 +114,24 @@ class SifiveE31CacheHierarchy(
             for i in range(board.get_processor().get_num_cores())
         ]
 
+        self.l2buses = [
+            L2XBar() for i in range(board.get_processor().get_num_cores())
+        ]
+        self.l2caches = [
+            L2Cache(size=self._l2_size, assoc=self._l2_assoc)
+            for i in range(board.get_processor().get_num_cores())
+        ]
+        # ITLB Page walk caches
+        self.iptw_caches = [
+            MMUCache(size="4KiB")
+            for _ in range(board.get_processor().get_num_cores())
+        ]
+        # DTLB Page walk caches
+        self.dptw_caches = [
+            MMUCache(size="4KiB")
+            for _ in range(board.get_processor().get_num_cores())
+        ]
+
         if board.has_coherent_io():
             self._setup_io_cache(board)
 
@@ -158,8 +140,18 @@ class SifiveE31CacheHierarchy(
             cpu.connect_icache(self.l1icaches[i].cpu_side)
             cpu.connect_dcache(self.l1dcaches[i].cpu_side)
 
-            self.membus.cpu_side_ports = self.l1icaches[i].mem_side
-            self.membus.cpu_side_ports = self.l1dcaches[i].mem_side
+            self.l1icaches[i].mem_side = self.l2buses[i].cpu_side_ports
+            self.l1dcaches[i].mem_side = self.l2buses[i].cpu_side_ports
+            self.iptw_caches[i].mem_side = self.l2buses[i].cpu_side_ports
+            self.dptw_caches[i].mem_side = self.l2buses[i].cpu_side_ports
+
+            self.l2buses[i].mem_side_ports = self.l2caches[i].cpu_side
+
+            self.membus.cpu_side_ports = self.l2caches[i].mem_side
+
+            cpu.connect_walker_ports(
+                self.iptw_caches[i].cpu_side, self.dptw_caches[i].cpu_side
+            )
 
 
             if board.get_processor().get_isa() == ISA.X86:
